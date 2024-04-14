@@ -60,7 +60,6 @@ public class Minesweeper {
                 scan.nextLine();
                 continue;
             }
-
             if (x < 1 || x > COLUMNS || y < 1 || y > ROWS) {
                 System.out.println("Invalid coordinate");
                 scan.nextLine();
