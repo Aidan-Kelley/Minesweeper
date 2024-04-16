@@ -1,9 +1,16 @@
+import java.text.CollationElementIterator;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import utils.Coordinate;
 
 public class Board {
     public final int ROWS;
     public final int COLUMNS;
-    private final int MINE_AMOUNT = 10;
+    private final int TOTAL_MINES;
+    private final double MINE_PERCENTAGE = 0.15;
     private int tilesRevealed = 0;
 
     private String[][] displayField;
@@ -12,6 +19,7 @@ public class Board {
     public Board(int r, int c) {
         ROWS = r;
         COLUMNS = c;
+        TOTAL_MINES = (int) Math.ceil(r * c * MINE_PERCENTAGE);
         displayField = new String[ROWS][COLUMNS];
         trueField = new int[ROWS][COLUMNS];
         setupFields();
@@ -23,26 +31,31 @@ public class Board {
         }
 
         // reveal middle 9 spots (3x3), then generate the mines
-        // while MINE_AMOUTN != 0, go through each element to test mine
-        // once MINE_AMOUTN == 0, calculate numbers
         for (int r = (ROWS / 2) - 1; r < (ROWS / 2) + 2; r++) {
             for (int c = (COLUMNS / 2) - 1; c < (COLUMNS / 2) + 2; c++) {
                 trueField[r][c] = 11;// 11 will be skipped by the mine placing
                 tilesRevealed++;
             }
         }
-        int minesPlaced = 0;
-        while (minesPlaced < MINE_AMOUNT) {
-            for (int r = 0; r < ROWS; r++) {
-                for (int c = 0; c < COLUMNS; c++) {
-                    if (trueField[r][c] != 11 && Math.random() * 100 <= 5) { // if its not the middle 9, and hits the 5%
-                                                                             // chance, places the mine
-                        trueField[r][c] = 9; // 10 is a mine
-                        minesPlaced++;
-                        break;
-                    }
-                }
+
+        /*
+         * complicated thing that ensures all mines are placed
+         * probably an easier way to do this
+         */
+        List<Coordinate> coords = new ArrayList<>();
+        for (int i = 0; i < ROWS; i++)
+            for (int j = 0; j < COLUMNS; j++)
+                coords.add(new Coordinate(i, j));
+        Collections.shuffle(coords);
+        int minesPlaced = 0, i = 0;
+        while (minesPlaced < TOTAL_MINES) {
+            int r = coords.get(i).r;
+            int c = coords.get(i).c;
+            if (trueField[r][c] != 11) {
+                trueField[r][c] = 9;
+                minesPlaced++;
             }
+            i++;
         }
 
         for (int r = 0; r < trueField.length; r++) {// set up all the numbers
@@ -179,7 +192,7 @@ public class Board {
     }
 
     public boolean gameWon() {
-        int totalSafeTiles = ROWS * COLUMNS - MINE_AMOUNT;
+        int totalSafeTiles = ROWS * COLUMNS - TOTAL_MINES;
         return tilesRevealed >= totalSafeTiles;
     }
 }
