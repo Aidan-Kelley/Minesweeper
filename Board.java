@@ -1,8 +1,8 @@
 import java.util.Arrays;
 
 public class Board {
-    private final int ROWS;
-    private final int COLUMNS;
+    public final int ROWS;
+    public final int COLUMNS;
     private final int MINE_AMOUNT = 10;
     private int tilesRevealed = 0;
 
@@ -140,15 +140,15 @@ public class Board {
      */
     public boolean updateFields(int[] act) {
         int action = act[0];// 1: flag, 2: break, 3: unflag
-        int rownew = act[2] - 1;
-        int colnew = act[1] - 1;
+        int colnew = act[1];
+        int rownew = act[2];
         // next, set the field val to the truefield val to reveal number
         // if it is 9, its a mine. put X
-        if (action == 1) {// if flag
+        if (action == 0) {// if flag
             displayField[rownew][colnew] = " F ";
             return false;
         }
-        if (action == 2) {// if break
+        if (action == 1) {// if break
             if (trueField[rownew][colnew] == 9) {// if it's a mine, you lose
                 displayField[rownew][colnew] = " X ";
                 return true;
@@ -157,10 +157,25 @@ public class Board {
                 tilesRevealed++;
             }
         }
-        if (action == 3) {// if unflag
+        if (action == 2) {// if unflag
             displayField[rownew][colnew] = " ? ";
         }
-        return false;
+        return gameWon();
+    }
+
+    public boolean isActionValid(int[] action) {
+        int choice = action[0];
+        int c = action[1];
+        int r = action[2];
+        if (r < 0 || r > ROWS || c < 0 || c > COLUMNS) // ensure coord isn't out of boudn
+            return false;
+        if (choice == 0 && !displayField[r][c].equals(" ? ")) // only flag an unkkown
+            return false;
+        if (choice == 1 && !displayField[r][c].equals(" ? ")) // ensure tile isn't broken or flagged
+            return false;
+        if (choice == 2 && !displayField[r][c].equals(" F ")) // only allowed to unflag a flag
+            return false;
+        return true;
     }
 
     public boolean gameWon() {
