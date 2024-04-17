@@ -10,7 +10,7 @@ public class Board {
     public final int ROWS;
     public final int COLUMNS;
     private final int TOTAL_MINES;
-    private final double MINE_PERCENTAGE = 0.15;
+    private final double MINE_PERCENTAGE = 0.12;
     private int tilesRevealed = 0;
 
     private String[][] displayField;
@@ -22,26 +22,20 @@ public class Board {
         TOTAL_MINES = (int) Math.ceil(r * c * MINE_PERCENTAGE);
         displayField = new String[ROWS][COLUMNS];
         trueField = new int[ROWS][COLUMNS];
-        setupFields();
+        for (String[] row : displayField)
+            Arrays.fill(row, " ? ");
     }
 
-    private void setupFields() {
-        for (int r = 0; r < ROWS; r++) {
-            Arrays.fill(displayField[r], " ? ");
-        }
+    public void firstMove(int[] action) {
+        placeBombs(action[1], action[2]);
+        breakTile(action[1], action[2]);
+    }
 
-        // reveal middle 9 spots (3x3), then generate the mines
-        for (int r = (ROWS / 2) - 1; r < (ROWS / 2) + 2; r++) {
-            for (int c = (COLUMNS / 2) - 1; c < (COLUMNS / 2) + 2; c++) {
-                trueField[r][c] = 11;// 11 will be skipped by the mine placing
-                tilesRevealed++;
-            }
-        }
-
-        /*
-         * complicated thing that ensures all mines are placed
-         * probably an easier way to do this
-         */
+    /**
+     * Places bombs, avoiding the specified tile
+     *
+     */
+    private void placeBombs(int avoidRow, int avoidCol) {
         List<Coordinate> coords = new ArrayList<>();
         for (int i = 0; i < ROWS; i++)
             for (int j = 0; j < COLUMNS; j++)
@@ -51,7 +45,7 @@ public class Board {
         while (minesPlaced < TOTAL_MINES) {
             int r = coords.get(i).r;
             int c = coords.get(i).c;
-            if (trueField[r][c] != 11) {
+            if (r != avoidRow || c != avoidCol) {
                 trueField[r][c] = 9;
                 minesPlaced++;
             }
@@ -63,19 +57,14 @@ public class Board {
                 trueField[r][c] = setNumber(r, c);
             }
         }
-        for (int r = (ROWS / 2) - 1; r < (ROWS / 2) + 2; r++) {// set the middle
-            for (int c = (COLUMNS / 2) - 1; c < (COLUMNS / 2) + 2; c++) {
-                displayField[r][c] = " " + trueField[r][c] + " ";
-            }
-        }
     }
 
     private int setNumber(int row, int col) {
         int counter = 0;
-        int mineNumber = 9;
+        final int mineNumber = 9;
         // for same row
-        if (trueField[row][col] == 9) {// if it's a mine
-            return 9;
+        if (trueField[row][col] == mineNumber) {// if it's a mine
+            return mineNumber;
         }
         if (col > 0) {// not touching the left wall
             if (trueField[row][col - 1] == mineNumber) {// mine at top left
@@ -166,8 +155,7 @@ public class Board {
                 displayField[rownew][colnew] = " X ";
                 return true;
             } else {
-                displayField[rownew][colnew] = " " + trueField[rownew][colnew] + " ";
-                tilesRevealed++;
+                breakTile(rownew, colnew);
             }
         }
         if (action == 2) {// if unflag
@@ -180,7 +168,7 @@ public class Board {
         int choice = action[0];
         int c = action[1];
         int r = action[2];
-        if (r < 0 || r > ROWS || c < 0 || c > COLUMNS) // ensure coord isn't out of boudn
+        if (!inBounds(r, c)) // ensure coord isn't out of boudn
             return false;
         if (choice == 0 && !displayField[r][c].equals(" ? ")) // only flag an unkkown
             return false;
@@ -194,5 +182,29 @@ public class Board {
     public boolean gameWon() {
         int totalSafeTiles = ROWS * COLUMNS - TOTAL_MINES;
         return tilesRevealed >= totalSafeTiles;
+    }
+
+    private void breakTile(int row, int col) {
+        displayField[row][col] = " " + trueField[row][col] + " ";
+        tilesRevealed++;
+        if (trueField[row][col] == 0) {
+            breakAdjacentTiles(row, col);
+        }
+    }
+
+    private void breakAdjacentTiles(int row, int col) {
+        int r, c;
+        for (int y = -1; y <= 1; y++)
+            for (int x = -1; x <= 1; x++) {
+                r = row + y;
+                c = col + x;
+                if (inBounds(r, c))
+                    if (displayField[r][c].equals(" ? "))
+                        breakTile(r, c);
+            }
+    }
+
+    public boolean inBounds(int r, int c) {
+        return r >= 0 && r < ROWS && c >= 0 && c < COLUMNS;
     }
 }

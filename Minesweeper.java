@@ -18,6 +18,8 @@ public class Minesweeper {
         Graphics.displayTitle();
         Graphics.displayRules();
         scan.nextLine();
+        board.showField();
+        board.firstMove(getUserAction());
     }
 
     private void gameLoop() {
