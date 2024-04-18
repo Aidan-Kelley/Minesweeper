@@ -60,57 +60,17 @@ public class Board {
     }
 
     private int setNumber(int row, int col) {
-        int counter = 0;
         final int mineNumber = 9;
-        // for same row
         if (trueField[row][col] == mineNumber) {// if it's a mine
             return mineNumber;
         }
-        if (col > 0) {// not touching the left wall
-            if (trueField[row][col - 1] == mineNumber) {// mine at top left
-                counter++;
+        int counter = 0;
+        for (int r = row - 1; r <= row + 1; r++)
+            for (int c = col - 1; c <= col + 1; c++) {
+                if (inBounds(r, c))
+                    if (trueField[r][c] == mineNumber)
+                        counter++;
             }
-        }
-        if (col < trueField.length - 1) {// not touching the right wall
-            if (trueField[row][col + 1] == mineNumber) {// mine at top right
-                counter++;
-            }
-        }
-
-        // for top row
-        if (row > 0) {// if row is not touching the ceiling, check for top 3 elements
-            // let int[row][col] be the element we're modifying
-            if (trueField[row - 1][col] == mineNumber) {// mine at top
-                counter++;
-            }
-            if (col > 0) {// not touching the left wall
-                if (trueField[row - 1][col - 1] == mineNumber) {// mine at top left
-                    counter++;
-                }
-            }
-            if (col < trueField[0].length - 1) {// not touching the right wall
-                if (trueField[row - 1][col + 1] == mineNumber) {// mine at top right
-                    counter++;
-                }
-            }
-        }
-        if (row < trueField.length - 1) {// not touching the bottom
-            if (trueField[row + 1][col] == mineNumber) {// mine at bottom
-                counter++;
-            }
-            if (col > 0) {// not touching the left wall
-                if (trueField[row + 1][col - 1] == mineNumber) {// mine at top left
-                    counter++;
-                }
-            }
-            if (col < trueField[0].length - 1) {// not touching the right wall
-                if (trueField[row + 1][col + 1] == mineNumber) {// mine at top right
-                    counter++;
-                }
-            }
-
-        }
-
         return counter;
     }
 
@@ -186,22 +146,15 @@ public class Board {
 
     private void breakTile(int row, int col) {
         displayField[row][col] = " " + trueField[row][col] + " ";
-        tilesRevealed++;
+        // tilesRevealed++;
         if (trueField[row][col] == 0) {
-            breakAdjacentTiles(row, col);
+            for (int r = row - 1; r <= row + 1; r++)
+                for (int c = col - 1; c <= col + 1; c++) {
+                    if (inBounds(r, c))
+                        if (displayField[r][c].equals(" ? "))
+                            breakTile(r, c);
+                }
         }
-    }
-
-    private void breakAdjacentTiles(int row, int col) {
-        int r, c;
-        for (int y = -1; y <= 1; y++)
-            for (int x = -1; x <= 1; x++) {
-                r = row + y;
-                c = col + x;
-                if (inBounds(r, c))
-                    if (displayField[r][c].equals(" ? "))
-                        breakTile(r, c);
-            }
     }
 
     public boolean inBounds(int r, int c) {
