@@ -43,7 +43,7 @@ public class Board {
         while (minesPlaced < TOTAL_MINES) {
             int r = coords.get(i).y;
             int c = coords.get(i).x;
-            if (r != avoidRow || c != avoidCol) {
+            if (r < avoidRow - 1 || r > avoidRow + 1 || c < avoidCol - 1 || c > avoidCol + 1) {
                 trueField[r][c] = 9;
                 minesPlaced++;
             }
@@ -79,16 +79,14 @@ public class Board {
         }
         System.out.println();
         for (int r = 0; r < displayField.length; r++) { // add the row numbers
-            System.out.print((r + 1) + " ");
-            if (r < 9) {
-                System.out.print(" ");
-            }
+            System.out.printf("%-3d", r + 1);
+
             for (int c = 0; c < displayField[0].length; c++) {
                 System.out.print(displayField[r][c]);
             }
             System.out.println();
         }
-        System.out.println("\nF = Flagged\n");
+        // System.out.println("\nF = Flagged\n");
 
     }
 
