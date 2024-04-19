@@ -75,7 +75,7 @@ public class Board {
     public void showField() {
         System.out.print("   ");
         for (int i = 1; i <= displayField[0].length; i++) { // add the column numbers
-            System.out.print(" " + i + " ");
+            System.out.printf(" %-2d", i);
         }
         System.out.println();
         for (int r = 0; r < displayField.length; r++) { // add the row numbers
