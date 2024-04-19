@@ -86,8 +86,23 @@ public class Board {
             }
             System.out.println();
         }
-        // System.out.println("\nF = Flagged\n");
+    }
 
+    // System.out.println("\nF = Flagged\n");
+    public String toString() {
+        String str = "   ";
+        for (int i = 1; i <= displayField[0].length; i++) { // add the column numbers
+            str += String.format(" %-2d", i);
+        }
+        str += "\n";
+        for (int r = 0; r < displayField.length; r++) { // add the row numbers
+            str += String.format("%-3d", r + 1);
+            for (int c = 0; c < displayField[0].length; c++) {
+                str += displayField[r][c];
+            }
+            str += "\n";
+        }
+        return str;
     }
 
     /**

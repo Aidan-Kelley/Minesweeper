@@ -1,6 +1,8 @@
 
 import java.util.Scanner;
 
+import GUI.GameWindow;
+
 public class Minesweeper {
 
     private Board board;
@@ -14,7 +16,7 @@ public class Minesweeper {
     }
 
     private void initGame() {
-        board = new Board(5, 5);
+        board = new Board(12, 12);
         Graphics.displayTitle();
         Graphics.displayRules();
         scan.nextLine();
@@ -25,7 +27,7 @@ public class Minesweeper {
     private void gameLoop() {
         int[] act = new int[3];
         while (true) {
-            board.showField();
+            System.out.println(board);
             act = getUserAction();
             if (board.updateFields(act))
                 return;
