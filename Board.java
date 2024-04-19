@@ -142,7 +142,7 @@ public class Board {
 
     private void breakTile(int row, int col) {
         displayField[row][col] = " " + trueField[row][col] + " ";
-        // tilesRevealed++;
+        tilesRevealed++;
         if (trueField[row][col] == 0) {
             for (int r = row - 1; r <= row + 1; r++)
                 for (int c = col - 1; c <= col + 1; c++) {

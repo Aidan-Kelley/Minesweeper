@@ -14,7 +14,7 @@ public class Minesweeper {
     }
 
     private void initGame() {
-        board = new Board(8, 15);
+        board = new Board(5, 5);
         Graphics.displayTitle();
         Graphics.displayRules();
         scan.nextLine();
