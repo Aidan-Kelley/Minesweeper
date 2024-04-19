@@ -37,7 +37,7 @@ public class Board {
         List<Point> coords = new ArrayList<>();
         for (int i = 0; i < ROWS; i++)
             for (int j = 0; j < COLUMNS; j++)
-                coords.add(new Point(i, j));
+                coords.add(new Point(j, i));
         Collections.shuffle(coords);
         int minesPlaced = 0, i = 0;
         while (minesPlaced < TOTAL_MINES) {
