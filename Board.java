@@ -1,10 +1,8 @@
-import java.text.CollationElementIterator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-import utils.Coordinate;
+import java.awt.Point;
 
 public class Board {
     public final int ROWS;
@@ -36,15 +34,15 @@ public class Board {
      *
      */
     private void placeBombs(int avoidRow, int avoidCol) {
-        List<Coordinate> coords = new ArrayList<>();
+        List<Point> coords = new ArrayList<>();
         for (int i = 0; i < ROWS; i++)
             for (int j = 0; j < COLUMNS; j++)
-                coords.add(new Coordinate(i, j));
+                coords.add(new Point(i, j));
         Collections.shuffle(coords);
         int minesPlaced = 0, i = 0;
         while (minesPlaced < TOTAL_MINES) {
-            int r = coords.get(i).r;
-            int c = coords.get(i).c;
+            int r = coords.get(i).y;
+            int c = coords.get(i).x;
             if (r != avoidRow || c != avoidCol) {
                 trueField[r][c] = 9;
                 minesPlaced++;
