@@ -1,19 +1,22 @@
 package GUI;
 
 import java.awt.Color;
-import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-
 import javax.swing.JPanel;
+
+import Main.Board;
 
 public class Tile extends JPanel {
 
     private Color color;
+    private final Board board;
+    private final int ROW, COLUMN;
 
-    public Tile(int r, int c) {
+    public Tile(int r, int c, Board board) {
+        this.board = board;
+        ROW = r;
+        COLUMN = c;
         addMouseListener(new Listener());
         if ((r + c) % 2 == 0)
             color = new Color(0, 150, 0);
@@ -44,5 +47,9 @@ public class Tile extends JPanel {
             parent.revalidate();
         }
 
+        @Override
+        public void mousePressed(MouseEvent e) {
+            board.breakTile(ROW, COLUMN);
+        }
     }
 }

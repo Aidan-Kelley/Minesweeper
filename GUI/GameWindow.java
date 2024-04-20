@@ -6,14 +6,18 @@ import java.awt.event.*;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import Main.Board;
+
 public class GameWindow extends JFrame {
 
     private int TILE_WIDTH = 40;
     private int TILE_HEIGHT = 40;
     private Tile[][] tiles;
     private Container pane;
+    private final Board board;
 
     public GameWindow(int rows, int cols) {
+        board = new Board(12, 12);
         setTitle("Minesweeper");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(50 * rows, 50 * cols);
@@ -22,11 +26,10 @@ public class GameWindow extends JFrame {
         tiles = new Tile[rows][cols];
         for (int i = 0; i < rows; i++)
             for (int j = 0; j < cols; j++) {
-                tiles[i][j] = new Tile(i, j);
+                tiles[i][j] = new Tile(i, j, board);
                 pane.add(tiles[i][j]);
             }
         pane.setLayout(new GridLayout(rows, cols));
-
         addMouseListener(new WindowListener());
         setVisible(true);
     }

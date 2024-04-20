@@ -1,3 +1,5 @@
+package Main;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -26,7 +28,7 @@ public class Board {
 
     public void firstMove(int[] action) {
         placeBombs(action[1], action[2]);
-        breakTile(action[1], action[2]);
+        revealTiles(action[1], action[2]);
     }
 
     /**
@@ -122,12 +124,7 @@ public class Board {
             return false;
         }
         if (action == 1) {// if break
-            if (trueField[rownew][colnew] == 9) {// if it's a mine, you lose
-                displayField[rownew][colnew] = " X ";
-                return true;
-            } else {
-                breakTile(rownew, colnew);
-            }
+            return breakTile(rownew, colnew);
         }
         if (action == 2) {// if unflag
             displayField[rownew][colnew] = " ? ";
@@ -155,7 +152,17 @@ public class Board {
         return tilesRevealed >= totalSafeTiles;
     }
 
-    private void breakTile(int row, int col) {
+    public boolean breakTile(int row, int col) {
+        if (trueField[row][col] == 9) {// if it's a mine, you lose
+            displayField[row][col] = " X ";
+            return true;
+        } else {
+            revealTiles(row, col);
+        }
+        return false;
+    }
+
+    private void revealTiles(int row, int col) {
         displayField[row][col] = " " + trueField[row][col] + " ";
         tilesRevealed++;
         if (trueField[row][col] == 0) {
@@ -163,7 +170,7 @@ public class Board {
                 for (int c = col - 1; c <= col + 1; c++) {
                     if (inBounds(r, c))
                         if (displayField[r][c].equals(" ? "))
-                            breakTile(r, c);
+                            revealTiles(r, c);
                 }
         }
     }
