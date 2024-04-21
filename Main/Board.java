@@ -114,7 +114,8 @@ public class Board {
     public boolean breakTile(int row, int col) {
         if (trueField[row][col] == 9) // if it's a mine
             if (firstMove) {
-                replaceMine(row, col);
+                // replaceMine(row, col);
+                placeMines();
                 revealTiles(row, col);
             } else {
                 tiles[row][col].set(" X ");
