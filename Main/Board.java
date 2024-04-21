@@ -32,11 +32,7 @@ public class Board {
         TOTAL_MINES = (int) Math.ceil(r * c * MINE_PERCENTAGE);
     }
 
-    /**
-     * Places bombs, avoiding the specified tile
-     *
-     */
-    public void placeMines() {
+    private void placeMines(int avoidRow, int avoidCol) {
         List<Point> coords = new ArrayList<>();
         for (int i = 0; i < ROWS; i++)
             for (int j = 0; j < COLUMNS; j++)
@@ -46,28 +42,13 @@ public class Board {
         while (minesPlaced < TOTAL_MINES) {
             int r = coords.get(i).y;
             int c = coords.get(i).x;
-            trueField[r][c] = 9;
-            minesPlaced++;
+            if (r < avoidRow - 1 || r > avoidRow + 1 || c < avoidCol - 1 || c > avoidCol + 1) {
+                trueField[r][c] = 9;
+                minesPlaced++;
+            }
             i++;
         }
 
-        for (int r = 0; r < trueField.length; r++) {// set up all the numbers
-            for (int c = 0; c < trueField[0].length; c++) {
-                trueField[r][c] = setNumber(r, c);
-            }
-        }
-    }
-
-    private void replaceMine(int row, int col) {
-        trueField[row][col] = 0;
-        while (true) {
-            int r = (int) (Math.random() * ROWS);
-            int c = (int) (Math.random() * COLUMNS);
-            if (trueField[r][c] != 9) {
-                trueField[r][c] = 9;
-                break;
-            }
-        }
         for (int r = 0; r < trueField.length; r++) {// set up all the numbers
             for (int c = 0; c < trueField[0].length; c++) {
                 trueField[r][c] = setNumber(r, c);
@@ -90,40 +71,23 @@ public class Board {
         return counter;
     }
 
-    public String toString() {
-        String str = "   ";
-        for (int i = 1; i <= tiles[0].length; i++) { // add the column numbers
-            str += String.format(" %-2d", i);
-        }
-        str += "\n";
-        for (int r = 0; r < tiles.length; r++) { // add the row numbers
-            str += String.format("%-3d", r + 1);
-            for (int c = 0; c < tiles[0].length; c++) {
-                str += tiles[r][c];
-            }
-            str += "\n";
-        }
-        return str;
-    }
-
     public boolean gameWon() {
         int totalSafeTiles = ROWS * COLUMNS - TOTAL_MINES;
         return tilesRevealed >= totalSafeTiles;
     }
 
     public boolean breakTile(int row, int col) {
-        if (trueField[row][col] == 9) // if it's a mine
-            if (firstMove) {
-                // replaceMine(row, col);
-                placeMines();
-                revealTiles(row, col);
-            } else {
-                tiles[row][col].set(" X ");
-                endGame();
-            }
-        else
+        if (firstMove) {
+            // replaceMine(row, col);
+            placeMines(row, col);
             revealTiles(row, col);
-        firstMove = false;
+            firstMove = false;
+        }
+        if (trueField[row][col] == 9) { // if it's a mine
+            tiles[row][col].set(" X ");
+            endGame();
+        } else
+            revealTiles(row, col);
         return false;
     }
 

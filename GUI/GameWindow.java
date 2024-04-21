@@ -31,7 +31,6 @@ public class GameWindow extends JFrame {
             }
         pane.setLayout(new GridLayout(ROWS, COLUMNS));
         setVisible(true);
-        // board.placeMines();
     }
 
 }
