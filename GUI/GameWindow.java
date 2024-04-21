@@ -15,7 +15,6 @@ public class GameWindow extends JFrame {
         ROWS = r;
         COLUMNS = c;
         initGame();
-        board.placeBombs();
 
     }
 
@@ -32,6 +31,7 @@ public class GameWindow extends JFrame {
             }
         pane.setLayout(new GridLayout(ROWS, COLUMNS));
         setVisible(true);
+        board.placeMines();
     }
 
 }

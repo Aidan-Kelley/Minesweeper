@@ -13,7 +13,7 @@ public class Board {
     public final int ROWS;
     public final int COLUMNS;
     private final int TOTAL_MINES;
-    private final double MINE_PERCENTAGE = 0.12;
+    private final double MINE_PERCENTAGE = 0.3;
     private int tilesRevealed = 0;
     private boolean firstMove = true;
 
@@ -36,7 +36,7 @@ public class Board {
      * Places bombs, avoiding the specified tile
      *
      */
-    public void placeBombs() {
+    public void placeMines() {
         List<Point> coords = new ArrayList<>();
         for (int i = 0; i < ROWS; i++)
             for (int j = 0; j < COLUMNS; j++)
@@ -51,6 +51,23 @@ public class Board {
             i++;
         }
 
+        for (int r = 0; r < trueField.length; r++) {// set up all the numbers
+            for (int c = 0; c < trueField[0].length; c++) {
+                trueField[r][c] = setNumber(r, c);
+            }
+        }
+    }
+
+    private void replaceMine(int row, int col) {
+        trueField[row][col] = 0;
+        while (true) {
+            int r = (int) (Math.random() * ROWS);
+            int c = (int) (Math.random() * COLUMNS);
+            if (trueField[r][c] != 9) {
+                trueField[r][c] = 9;
+                break;
+            }
+        }
         for (int r = 0; r < trueField.length; r++) {// set up all the numbers
             for (int c = 0; c < trueField[0].length; c++) {
                 trueField[r][c] = setNumber(r, c);
@@ -89,43 +106,23 @@ public class Board {
         return str;
     }
 
-    /**
-     * updated field based on player action
-     * 
-     * @param act the player's action
-     * @return whether or not the game is finished
-     */
-    public boolean updateFields(int[] act) {
-        int action = act[0];// 1: flag, 2: break, 3: unflag
-        int colnew = act[1];
-        int rownew = act[2];
-        // next, set the field val to the truefield val to reveal number
-        // if it is 9, its a mine. put X
-        if (action == 0) {// if flag
-            tiles[rownew][colnew].set(" F ");
-            return false;
-        }
-        if (action == 1) {// if break
-            return breakTile(rownew, colnew);
-        }
-        if (action == 2) {// if unflag
-            tiles[rownew][colnew].set(" ? ");
-        }
-        return gameWon();
-    }
-
     public boolean gameWon() {
         int totalSafeTiles = ROWS * COLUMNS - TOTAL_MINES;
         return tilesRevealed >= totalSafeTiles;
     }
 
     public boolean breakTile(int row, int col) {
-        if (trueField[row][col] == 9) {// if it's a mine, you lose
-            tiles[row][col].set(" X ");
-            endGame();
-        } else {
+        if (trueField[row][col] == 9) // if it's a mine
+            if (firstMove) {
+                replaceMine(row, col);
+                revealTiles(row, col);
+            } else {
+                tiles[row][col].set(" X ");
+                endGame();
+            }
+        else
             revealTiles(row, col);
-        }
+        firstMove = false;
         return false;
     }
 
