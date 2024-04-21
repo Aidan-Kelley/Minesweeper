@@ -131,6 +131,7 @@ public class Board {
 
     private void revealTiles(int row, int col) {
         tiles[row][col].set(trueField[row][col] + "");
+        tiles[row][col].revealed = true;
         tilesRevealed++;
         if (trueField[row][col] == 0) {
             for (int r = row - 1; r <= row + 1; r++)

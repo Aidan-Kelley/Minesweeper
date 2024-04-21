@@ -113,9 +113,9 @@ public class Tile extends JPanel {
 
         @Override
         public void mousePressed(MouseEvent e) {
-            if (e.getButton() == MouseEvent.BUTTON1 && !flagged)
+            if (e.getButton() == MouseEvent.BUTTON1 && !flagged && !revealed) {
                 board.breakTile(ROWS, COLUMNS);
-            else if (e.getButton() == MouseEvent.BUTTON3 && !flagged)
+            } else if (e.getButton() == MouseEvent.BUTTON3 && !revealed)
                 toggleFlag();
         }
 
