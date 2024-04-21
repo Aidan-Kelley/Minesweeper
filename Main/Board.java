@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import GUI.Tile;
+
 import java.awt.Point;
 
 public class Board {
@@ -12,30 +15,28 @@ public class Board {
     private final int TOTAL_MINES;
     private final double MINE_PERCENTAGE = 0.12;
     private int tilesRevealed = 0;
+    private boolean firstMove = true;
 
-    private String[][] displayField;
+    public Tile[][] tiles;
     private int[][] trueField;
 
     public Board(int r, int c) {
+        trueField = new int[r][c];
+        tiles = new Tile[r][c];
+        for (int i = 0; i < r; i++)
+            for (int j = 0; j < c; j++) {
+                tiles[i][j] = new Tile(i, j, this);
+            }
         ROWS = r;
         COLUMNS = c;
         TOTAL_MINES = (int) Math.ceil(r * c * MINE_PERCENTAGE);
-        displayField = new String[ROWS][COLUMNS];
-        trueField = new int[ROWS][COLUMNS];
-        for (String[] row : displayField)
-            Arrays.fill(row, " ? ");
-    }
-
-    public void firstMove(int[] action) {
-        placeBombs(action[1], action[2]);
-        revealTiles(action[1], action[2]);
     }
 
     /**
      * Places bombs, avoiding the specified tile
      *
      */
-    private void placeBombs(int avoidRow, int avoidCol) {
+    public void placeBombs() {
         List<Point> coords = new ArrayList<>();
         for (int i = 0; i < ROWS; i++)
             for (int j = 0; j < COLUMNS; j++)
@@ -45,10 +46,8 @@ public class Board {
         while (minesPlaced < TOTAL_MINES) {
             int r = coords.get(i).y;
             int c = coords.get(i).x;
-            if (r < avoidRow - 1 || r > avoidRow + 1 || c < avoidCol - 1 || c > avoidCol + 1) {
-                trueField[r][c] = 9;
-                minesPlaced++;
-            }
+            trueField[r][c] = 9;
+            minesPlaced++;
             i++;
         }
 
@@ -74,33 +73,16 @@ public class Board {
         return counter;
     }
 
-    public void showField() {
-        System.out.print("   ");
-        for (int i = 1; i <= displayField[0].length; i++) { // add the column numbers
-            System.out.printf(" %-2d", i);
-        }
-        System.out.println();
-        for (int r = 0; r < displayField.length; r++) { // add the row numbers
-            System.out.printf("%-3d", r + 1);
-
-            for (int c = 0; c < displayField[0].length; c++) {
-                System.out.print(displayField[r][c]);
-            }
-            System.out.println();
-        }
-    }
-
-    // System.out.println("\nF = Flagged\n");
     public String toString() {
         String str = "   ";
-        for (int i = 1; i <= displayField[0].length; i++) { // add the column numbers
+        for (int i = 1; i <= tiles[0].length; i++) { // add the column numbers
             str += String.format(" %-2d", i);
         }
         str += "\n";
-        for (int r = 0; r < displayField.length; r++) { // add the row numbers
+        for (int r = 0; r < tiles.length; r++) { // add the row numbers
             str += String.format("%-3d", r + 1);
-            for (int c = 0; c < displayField[0].length; c++) {
-                str += displayField[r][c];
+            for (int c = 0; c < tiles[0].length; c++) {
+                str += tiles[r][c];
             }
             str += "\n";
         }
@@ -120,31 +102,16 @@ public class Board {
         // next, set the field val to the truefield val to reveal number
         // if it is 9, its a mine. put X
         if (action == 0) {// if flag
-            displayField[rownew][colnew] = " F ";
+            tiles[rownew][colnew].set(" F ");
             return false;
         }
         if (action == 1) {// if break
             return breakTile(rownew, colnew);
         }
         if (action == 2) {// if unflag
-            displayField[rownew][colnew] = " ? ";
+            tiles[rownew][colnew].set(" ? ");
         }
         return gameWon();
-    }
-
-    public boolean isActionValid(int[] action) {
-        int choice = action[0];
-        int c = action[1];
-        int r = action[2];
-        if (!inBounds(r, c)) // ensure coord isn't out of boudn
-            return false;
-        if (choice == 0 && !displayField[r][c].equals(" ? ")) // only flag an unkkown
-            return false;
-        if (choice == 1 && !displayField[r][c].equals(" ? ")) // ensure tile isn't broken or flagged
-            return false;
-        if (choice == 2 && !displayField[r][c].equals(" F ")) // only allowed to unflag a flag
-            return false;
-        return true;
     }
 
     public boolean gameWon() {
@@ -154,8 +121,8 @@ public class Board {
 
     public boolean breakTile(int row, int col) {
         if (trueField[row][col] == 9) {// if it's a mine, you lose
-            displayField[row][col] = " X ";
-            return true;
+            tiles[row][col].set(" X ");
+            endGame();
         } else {
             revealTiles(row, col);
         }
@@ -163,13 +130,13 @@ public class Board {
     }
 
     private void revealTiles(int row, int col) {
-        displayField[row][col] = " " + trueField[row][col] + " ";
+        tiles[row][col].set(trueField[row][col] + "");
         tilesRevealed++;
         if (trueField[row][col] == 0) {
             for (int r = row - 1; r <= row + 1; r++)
                 for (int c = col - 1; c <= col + 1; c++) {
                     if (inBounds(r, c))
-                        if (displayField[r][c].equals(" ? "))
+                        if (tiles[r][c].toString().equals(" ? "))
                             revealTiles(r, c);
                 }
         }
@@ -177,5 +144,13 @@ public class Board {
 
     public boolean inBounds(int r, int c) {
         return r >= 0 && r < ROWS && c >= 0 && c < COLUMNS;
+    }
+
+    private void endGame() {
+        for (int r = 0; r < ROWS; r++)
+            for (int c = 0; c < COLUMNS; c++) {
+                tiles[r][c].set(":(");
+                tiles[r][c].disable();
+            }
     }
 }
